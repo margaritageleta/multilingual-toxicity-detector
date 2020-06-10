@@ -1,1 +1,6 @@
 jigsaw-multilingual-toxic-comment-classification/*
+models/
+special_tokens_map.json
+submission.csv
+tokenizer_config.json
+vocab.txt
