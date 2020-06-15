@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Toxicity detector</title>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="/css/style.css">
+
+        <script type=text/javascript>
+            /*
+            $(function() {
+                $('input[name="model"]').on('input',function(e) {
+                $.getJSON('/predict', {
+                  input: $('input[name="model"]').val(),
+                }, function(data) {
+                  $("#result").text(data.result);
+                });
+                return false;
+              });
+            });*/
+
+            $(document).ready(function() {
+                // e stands for event
+                $('input[name="model"]').on('input', function(e) {
+                    $.ajax({
+                        // data
+                        data : {
+                            text: this.val()
+                        },
+                        type : 'POST',
+                        url : '/process'
+                    })
+                    // What to do next
+                    .done(function(data) {
+                        if (data.error) {
+                            $('#result').text(data.error).show();
+                            // .hide()
+                        } else {
+                            $('#result').text(data.text).show();
+                        }
+                    })
+                    // Prevent submitting data twice (by default)
+                    e.preventDefault();
+                });
+            });
+
+          </script>
+    </head>
+
+    <body>
+        <form action="{{ url_for('process')}}" method="post">
+            <input type="text" name="text" placeholder="Write down ..." required="required"/>
+            <!--<button type="submit" class="btn btn-primary btn-block btn-large">Toxicity</button>-->
+        </form>
+        <p><a href="javascript:void();" id="calculate">calculate server side</a>
+
+        <p id="result">{{ prediction_text }}</p>
+    </body>
+</html>
