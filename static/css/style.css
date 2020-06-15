@@ -1,0 +1,67 @@
+:root {
+    --hue: 100;
+   }
+
+html, body {
+    margin: 0;
+    background-color: hsl(var(--hue), 100%, 85%);
+
+    -webkit-transition: 0.5s ease-out;
+    -moz-transition: 0.5s ease-out;
+    -o-transition: 0.5s ease-out;
+    transition: 0.5s ease-out;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Bellota', cursive;
+    
+}
+
+.wrapper {
+    background-color: transparent;
+    width: max-content;
+    height: 250px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+
+    border-radius: 10px;
+    box-shadow: 0 0 25px rgba(5,5,38,0.1);
+}
+
+.content-grid {
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+textarea {
+    width: 500px;
+    height: 120px;
+    resize: none;
+    background-color: transparent;
+    font-size: 18px;
+
+    padding: 20px;
+    border-style: none;
+    border-width: 0;
+}
+
+.result-wrapper {
+    height: 50px;
+    width: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.result-wrapper p {
+    font-size: 80px;
+}

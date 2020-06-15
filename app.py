@@ -2,7 +2,6 @@ import flask
 from flask import Flask, request, jsonify, render_template
 import numpy as np
 import pandas as pd
-import numba
 import tensorflow as tf
 from tensorflow.keras.models import Model
 from tokenizers import BertWordPieceTokenizer
@@ -25,55 +24,42 @@ def fast_encode(texts, tokenizer, chunk_size = 256, maxlen = 512):
         all_ids.extend([enc.ids for enc in encs])
     return np.array(all_ids)
 
-
-#tokenizer = BertWordPieceTokenizer('tokenizers/distilbert/vocab.txt', lowercase = False)
-#print(tokenizer)
-# load the pre-trained Keras model
-#model = tf.keras.models.load_model('models/distilbert_batch16_epochs3_maxlen192')
-#print(model)
+# Load tokenizer
+tokenizer = BertWordPieceTokenizer('tokenizers/distilbert/vocab.txt', lowercase = False)
+print('Tokenizer initialized.')
+# Load the pre-trained Keras model
+model = tf.keras.models.load_model('models/distilbert_batch16_epochs3_maxlen192')
+print('Model loaded.')
 
 def toxic(text):
     word = pd.DataFrame(data = {'content': [text]})
-    print(word)
     word_test = fast_encode(word.content.astype(str), tokenizer, maxlen = 192)
-    print(word_test)
     word_test_dataset = (
         tf.data.Dataset
         .from_tensor_slices(word_test)
         .batch(16)
     )
-    print(word_test_dataset)
     pred = model.predict(word_test_dataset, verbose = 1)
-    print(pred)
-    return f'Toxic {np.round(pred[0][0] * 100, 3)}%'
+    return np.round(pred[0][0] * 100, 0)
 
-# initialize our Flask application and the Keras model
+# Initialize our Flask application and the Keras model
 app = Flask(__name__, static_url_path = '', static_folder = 'static')
 
 @app.route('/')
 def home():
     return render_template('index.html')
 
-@app.route('/process', methods=['POST'])
-def process():
-    
-    text = request.form['text']
-    print(f'request: {text}')
-
+@app.route('/predict', methods=['GET'])
+def predict():
+    # Request the input
+    text = request.args.get('input')
     if text:
-        return jsonify({'text' : text})
-    return jsonify({'error' : 'No data provided'})
-    #print(f'request values: {request.form.values()}')
-    #input = [x for x in request.form.values()][0]
-    #print(input)
-
-    #output = toxic(input)
-    #output = input
-    #print(output)
-
-    #return render_template('index.html', prediction_text = f'Toxicity: {output}')
+        # Predict using toxicity model
+        output = toxic(text)
+        print(output)
+    else: output = '0.0'
+    return app.response_class(response = f'{output}', status = 200, mimetype = 'application/text')
 
 if __name__ == '__main__':
-    
 
     app.run()
